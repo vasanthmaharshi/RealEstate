@@ -1,5 +1,7 @@
-package com.company;
+package com.company.project;
 
+
+import com.company.HeapNode;
 
 public class heapHelper {
     public int heapInsert(HeapNode[] Heap, HeapNode newNode, int size){
