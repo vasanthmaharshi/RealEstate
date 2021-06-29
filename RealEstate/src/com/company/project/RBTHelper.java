@@ -1,6 +1,9 @@
 package com.company.project;
 import com.company.Colour;
+import com.company.HeapNode;
 import com.company.RBTNode;
+
+import javax.sound.midi.SysexMessage;
 
 public class RBTHelper {
     private RBTNode root;
@@ -80,34 +83,34 @@ public class RBTHelper {
 
     private void rightRotation(RBTNode node){
         System.out.println("Rotating to the right on node "+node.getBuildingNum());
-
+        //printNode(root, 17);
         RBTNode tempLeftNode = node.getLeftNode();
         node.setLeftNode(tempLeftNode.getRightNode());
-        if(node.getLeftNode()!=null){
-            node.getLeftNode().setParentNode(node);
+        if (tempLeftNode.getRightNode() != null) {
+            tempLeftNode.getRightNode().setParentNode(node);
         }
         tempLeftNode.setParentNode(node.getParentNode());
-        if(tempLeftNode.getParentNode()==null){
+        if (node.getParentNode() == null) {
             root = tempLeftNode;
-        }else if(node == node.getParentNode().getLeftNode()){
+        } else if (node == node.getParentNode().getLeftNode()) {
             node.getParentNode().setLeftNode(tempLeftNode);
-        }else{
+        } else {
             node.getParentNode().setRightNode(tempLeftNode);
         }
         tempLeftNode.setRightNode(node);
         node.setParentNode(tempLeftNode);
+        //printNode(root, 13);
     }
 
     public void leftRotation(RBTNode node){
         System.out.println("Rotating to the left on node "+node.getBuildingNum());
-
         RBTNode tempRightNode = node.getRightNode();
         node.setRightNode(tempRightNode.getLeftNode());
-        if(node.getRightNode()!=null){
-            node.getRightNode().setParentNode(node);
+        if(tempRightNode.getLeftNode()!=null){
+            tempRightNode.getLeftNode().setParentNode(node);
         }
         tempRightNode.setParentNode(node.getParentNode());
-        if(tempRightNode.getParentNode()==null){
+        if(node.getParentNode()==null){
             root = tempRightNode;
         }else if(node==node.getParentNode().getLeftNode()){
             node.getParentNode().setLeftNode(tempRightNode);
@@ -117,6 +120,29 @@ public class RBTHelper {
         tempRightNode.setLeftNode(node);
         node.setParentNode(tempRightNode);
     }
+    /*public void leftRotation(RBTNode x){
+        System.out.println("Rotating to the left on node "+x.getBuildingNum());
+        printNode(root, 13);
+        printNode(root, 14);
+        RBTNode y = x.getRightNode();
+        x.setRightNode(y.getLeftNode());
+        if(y.getLeftNode()!=null){
+            y.getLeftNode().setParentNode(x);
+        }
+        y.setParentNode(x.getParentNode());
+        if(x.getParentNode()==null){
+            root = y;
+        }else if(x==x.getParentNode().getLeftNode()){
+            x.getParentNode().setLeftNode(y);
+        }else {
+            x.getParentNode().setRightNode(y);
+        }
+        y.setLeftNode(x);
+        x.setParentNode(y);
+        printNode(root, 13);
+        printNode(root, 14);
+        printNode(root, 17);
+    }*/
 
     /*public RBTNode deleteNode(RBTNode root, RBTNode node){
         if(root==null){
@@ -155,12 +181,13 @@ public class RBTHelper {
     }*/
 
     public void deleteNode(int buildingNum){
+        System.out.println("Deleting: "+buildingNum);
         deleteNodeHelper(root, buildingNum);
     }
 
     private void deleteNodeHelper(RBTNode node, int buildingNum){
         RBTNode v = null;
-        RBTNode u;
+        RBTNode u = null;
         while(node!=null){
             if(node.getBuildingNum()==buildingNum){
                 v = node;
@@ -171,19 +198,26 @@ public class RBTHelper {
                 node = node.getRightNode();
             }
         }
+        RBTNode successor = null;
         if(v == null){
             System.out.println("Couldn't find the building ");
             return;
         }
-
+        Colour vOriginalColour = getColour(v);
         if(v.getLeftNode()!=null && v.getRightNode()==null){
             u = v.getLeftNode();
         }else if(v.getLeftNode()==null && v.getRightNode()!=null){
             u = v.getRightNode();
         }else if(v.getLeftNode()!=null && v.getRightNode()!=null){
-            RBTNode successor = getSuccessor(v.getRightNode());
-            switchNodes(v, successor);
-            System.out.println("["+v.getBuildingNum()+" "+v.getColour()+"]"+"["+successor.getBuildingNum()+" "+successor.getColour()+"]");
+            successor = getSuccessor(v.getRightNode());
+            //printNode(root, 14);
+            printNode(root, v.getBuildingNum());
+            swapData(v, successor);
+            v = successor;
+            System.out.println(v.getBuildingNum());
+            //printNode(root, v.getBuildingNum());
+            //printNode(root, successor.getBuildingNum());
+            vOriginalColour = getColour(v);
             if(v.getRightNode()!=null){
                 u = v.getRightNode();
             }else {
@@ -192,35 +226,45 @@ public class RBTHelper {
         }else {
             u = null;
         }
-        fixDelete(v, u);
+        fixDelete(v,u);
+
     }
 
     private void fixDelete(RBTNode v, RBTNode u){
-        RBTNode y = v;
-        RBTNode x = u;
+        RBTNode y = u;
+        RBTNode x = v;
         if(u!=null){
             if(getColour(v)==Colour.RED || getColour(u)==Colour.RED){
                 rbTransplant(v, u);
-                u.setNodeColour(Colour.BLACK);
+                if(u!=null && getColour(u)==Colour.RED){
+                    u.setNodeColour(Colour.BLACK);
+                }else {
+                    v.setNodeColour(Colour.BLACK);
+                }
             }else {
                 rbTransplant(v, u);
                 RBTNode p, s, r;
+                printNode(root, u.getBuildingNum());
                 while(getColour(u)==Colour.BLACK && u!=root){
                     p = u.getParentNode();
                     if(u==u.getParentNode().getRightNode()){
                         s = u.getParentNode().getLeftNode();
+                        printNode(root, s.getBuildingNum());
                         if(getColour(s)==Colour.BLACK){
                             if(getColour(s.getLeftNode())==Colour.RED){
-                               r = s.getLeftNode();
-                               rightRotation(p);
-                               r.setNodeColour(Colour.BLACK);
-                               u.setNodeColour(Colour.BLACK);
+                                r = s.getLeftNode();
+                                rightRotation(p);
+                                r.setNodeColour(Colour.BLACK);
+                                u.setNodeColour(Colour.BLACK);
+                                u = root;
                             }else if(getColour(s.getRightNode())==Colour.RED){
                                 r = s.getRightNode();
+                                printNode(root, r.getBuildingNum());
                                 leftRotation(s);
                                 rightRotation(p);
                                 r.setNodeColour(Colour.BLACK);
                                 u.setNodeColour(Colour.BLACK);
+                                u = root;
                             }else if(getColour(s.getLeftNode())==Colour.BLACK && getColour(s.getRightNode())==Colour.BLACK){
                                 reColour(s);
                                 if(getColour(p)==Colour.BLACK){
@@ -244,12 +288,14 @@ public class RBTHelper {
                                 leftRotation(p);
                                 r.setNodeColour(Colour.BLACK);
                                 u.setNodeColour(Colour.BLACK);
+                                u = root;
                             }else if(getColour(s.getLeftNode())==Colour.RED){
                                 r = s.getLeftNode();
                                 rightRotation(s);
                                 leftRotation(p);
                                 r.setNodeColour(Colour.BLACK);
                                 u.setNodeColour(Colour.BLACK);
+                                u = root;
                             }else if(getColour(s.getLeftNode())==Colour.BLACK && getColour(s.getRightNode())==Colour.BLACK){
                                 reColour(s);
                                 if(getColour(p)==Colour.BLACK){
@@ -267,10 +313,86 @@ public class RBTHelper {
                         }
                     }
                 }
-                u = root;
             }
         }else {
-
+            RBTNode ov = v;
+            if(getColour(v)==Colour.RED){
+                rbTransplant(v, u);
+                v.setNodeColour(Colour.BLACK);
+            }else {
+                RBTNode p, s, r;
+                System.out.println("case 2");
+                printNode(root, v.getBuildingNum());
+                while(getColour(v)==Colour.BLACK && v!=root){
+                    p = v.getParentNode();
+                    if(v==v.getParentNode().getRightNode()){
+                        s = v.getParentNode().getLeftNode();
+                        printNode(root, s.getBuildingNum());
+                        if(getColour(s)==Colour.BLACK){
+                            if(getColour(s.getLeftNode())==Colour.RED){
+                                r = s.getLeftNode();
+                                rightRotation(p);
+                                r.setNodeColour(Colour.BLACK);
+                                v.setNodeColour(Colour.BLACK);
+                                v = root;
+                            }else if(getColour(s.getRightNode())==Colour.RED){
+                                r = s.getRightNode();
+                                printNode(root, r.getBuildingNum());
+                                leftRotation(s);
+                                rightRotation(p);
+                                r.setNodeColour(Colour.BLACK);
+                                v.setNodeColour(Colour.BLACK);
+                                v = root;
+                            }else if(getColour(s.getLeftNode())==Colour.BLACK && getColour(s.getRightNode())==Colour.BLACK){
+                                reColour(s);
+                                if(getColour(p)==Colour.BLACK){
+                                    v = p;
+                                }else {
+                                    reColour(p);
+                                    v = root;
+                                }
+                            }
+                        }else if(getColour(s)==Colour.RED){
+                            rightRotation(p);
+                            reColour(s);
+                            reColour(p);
+                            s = v.getParentNode().getLeftNode();
+                        }
+                    }else {
+                        s = v.getParentNode().getRightNode();
+                        if(getColour(s)==Colour.BLACK){
+                            if(getColour(s.getRightNode())==Colour.RED){
+                                r = s.getRightNode();
+                                leftRotation(p);
+                                r.setNodeColour(Colour.BLACK);
+                                v.setNodeColour(Colour.BLACK);
+                                v = root;
+                            }else if(getColour(s.getLeftNode())==Colour.RED){
+                                r = s.getLeftNode();
+                                rightRotation(s);
+                                leftRotation(p);
+                                r.setNodeColour(Colour.BLACK);
+                                v.setNodeColour(Colour.BLACK);
+                                v = root;
+                            }else if(getColour(s.getLeftNode())==Colour.BLACK && getColour(s.getRightNode())==Colour.BLACK){
+                                reColour(s);
+                                if(getColour(p)==Colour.BLACK){
+                                    v = p;
+                                }else {
+                                    reColour(p);
+                                    v = root;
+                                }
+                            }
+                        }else if(getColour(s)==Colour.RED){
+                            leftRotation(p);
+                            reColour(s);
+                            reColour(p);
+                            s = v.getParentNode().getRightNode();
+                        }
+                    }
+                }
+                rbTransplant(ov, null);
+            }
         }
     }
 
@@ -288,7 +410,63 @@ public class RBTHelper {
     }
 
     private void switchNodes(RBTNode x, RBTNode y){
-        System.out.println("["+x.getBuildingNum()+" "+x.getColour()+"]"+"["+y.getBuildingNum()+" "+y.getColour()+"]");
+        System.out.println("Switching node "+x.getBuildingNum()+" "+y.getBuildingNum());
+        RBTNode xParent;
+        RBTNode xLeft = x.getLeftNode();
+        RBTNode xRight = x.getRightNode();
+        Colour xColour = getColour(x);
+        Boolean xPos = false;
+        if(x==root){
+            xParent = null;
+        }else{
+            xParent = x.getParentNode();
+            if(x == x.getParentNode().getRightNode()){
+                xPos = true;
+            }
+        }
+        RBTNode yParent = y.getParentNode();
+        RBTNode yLeft = y.getLeftNode();
+        RBTNode yRight = y.getRightNode();
+        Colour yColour = getColour(y);
+        Boolean yPos = false;
+        if(y == y.getParentNode().getRightNode()){
+            yPos = true;
+        }
+
+        if(x==root){
+            root = y;
+            y.setParentNode(xParent);
+        }else {
+            y.setParentNode(xParent);
+            if(xPos==false){
+                xParent.setLeftNode(y);
+            }else {
+                xParent.setRightNode(y);
+            }
+        }
+        if(yParent==x){
+            x.setParentNode(y);
+            y.setRightNode(x);
+            y.setLeftNode(xLeft);
+            x.setLeftNode(yLeft);
+            x.setRightNode(yRight);
+        }else {
+            x.setParentNode(yParent);
+            if(yPos==false){
+                yParent.setLeftNode(x);
+            }else {
+                yParent.setRightNode(x);
+            }
+            y.setRightNode(xRight);
+            y.setLeftNode(xLeft);
+            x.setLeftNode(yLeft);
+            x.setRightNode(yRight);
+        }
+        x.setNodeColour(yColour);
+        y.setNodeColour(xColour);
+    }
+    /*private void switchNodes(RBTNode x, RBTNode y){
+        System.out.println("4 "+"["+x.getBuildingNum()+" "+x.getColour()+"]"+"["+y.getBuildingNum()+" "+y.getColour()+"]");
         RBTNode xCopy = new RBTNode(x);
         RBTNode x_parentNode = x.getParentNode();
         RBTNode y_parentNode = y.getParentNode();
@@ -317,117 +495,85 @@ public class RBTHelper {
         }
         x.setNodeColour(y.getColour());
         y.setNodeColour(xCopy.getColour());
+        System.out.println("5 "+"["+x.getBuildingNum()+" "+x.getColour()+"]"+"["+y.getBuildingNum()+" "+y.getColour()+"]");
+        System.out.println("6 "+"["+y.getLeftNode().getBuildingNum()+" "+y.getLeftNode().getColour()+"]"+"["+y.getRightNode().getBuildingNum()+" "+y.getRightNode().getColour()+"]");
+        //System.out.println("7 "+"["+x.getLeftNode().getBuildingNum()+" "+x.getLeftNode().getColour()+"]"+"["+x.getRightNode().getBuildingNum()+" "+x.getRightNode().getColour()+"]");
         xCopy = null;
-    }
-    /*private void deleteNodeHelper(RBTNode node, int buildingNum) {
-        RBTNode z = null;
-        RBTNode x, y;
-        while(node!=null){
-            //System.out.println(node.getBuildingNum()+" ");
-            if(node.getBuildingNum()==buildingNum){
-                z = node;
-            }
-            if(buildingNum<node.getBuildingNum()){
-                node = node.getLeftNode();
-            }else {
-                node = node.getRightNode();
-            }
-        }
-        if(z==null){
-            System.out.println("Couldn't find the building ");
-            return;
-        }
-        y = z;
-        Colour yOrignalColour = getColour(y);
-        if(z.getLeftNode()==null){
-            x = z.getRightNode();
-            rbTransplant(z, z.getRightNode());
-        }else if(z.getRightNode()==null){
-            x = z.getLeftNode();
-            rbTransplant(z, z.getLeftNode());
-        }else {
-            y = getSuccessor(z.getRightNode());
-            yOrignalColour = getColour(y);
-            x = y.getRightNode();
-            if(y.getParentNode() == z){
-                x.setParentNode(y);
-            }else {
-                rbTransplant(y, y.getRightNode());
-                y.setRightNode(z.getRightNode());
-                y.getRightNode().setParentNode(y);
-            }
-            rbTransplant(z, y);
-            y.setLeftNode(z.getLeftNode());
-            y.getLeftNode().setParentNode(y);
-            y.setNodeColour(getColour(z));
-        }
-        if(yOrignalColour == Colour.BLACK){
-            fixDelete(x);
-        }
-    }
-
-    private void fixDelete(RBTNode x) {
-        RBTNode sibling = null;
-        while(x != root && getColour(x)==Colour.BLACK){
-            if(x==x.getParentNode().getLeftNode()){
-                sibling = x.getParentNode().getRightNode();
-                if(getColour(sibling)==Colour.RED){
-                    sibling.setNodeColour(Colour.BLACK);
-                    x.getParentNode().setNodeColour(Colour.RED);
-                    leftRotation(x.getParentNode());
-                    sibling = x.getParentNode().getRightNode();
-                }
-                if(getColour(sibling.getLeftNode())==Colour.BLACK && getColour(sibling.getRightNode())==Colour.BLACK){
-                    sibling.setNodeColour(Colour.RED);
-                    x = x.getParentNode();
-                }else {
-                    if(getColour(sibling.getRightNode()) == Colour.BLACK){
-                        sibling.getLeftNode().setNodeColour(Colour.BLACK);
-                        sibling.setNodeColour(Colour.RED);
-                        rightRotation(sibling);
-                        sibling = x.getParentNode().getRightNode();
-                    }
-                    sibling.setNodeColour(getColour(x.getParentNode()));
-                    x.getParentNode().setNodeColour(Colour.BLACK);
-                    sibling.getRightNode().setNodeColour(Colour.BLACK);
-                    leftRotation(x.getParentNode());
-                    x = root;
-                }
-            }else {
-                sibling = x.getParentNode().getLeftNode();
-                if(getColour(sibling)==Colour.RED){
-                    sibling.setNodeColour(Colour.BLACK);
-                    x.getParentNode().setNodeColour(Colour.RED);
-                    rightRotation(x.getParentNode());
-                    sibling = x.getParentNode().getLeftNode();
-                }
-
-                if(getColour(sibling.getRightNode()) == Colour.BLACK && getColour(sibling.getRightNode()) == Colour.BLACK){
-                    sibling.setNodeColour(Colour.RED);
-                    x = x.getParentNode();
-                }else {
-                    if(getColour(sibling.getLeftNode()) == Colour.BLACK){
-                        sibling.getRightNode().setNodeColour(Colour.BLACK);
-                        sibling.setNodeColour(Colour.RED);
-                        leftRotation(sibling);
-                        sibling = x.getParentNode().getLeftNode();
-                    }
-                    sibling.setNodeColour(getColour(x.getParentNode()));
-                    x.getParentNode().setNodeColour(Colour.BLACK);
-                    sibling.getLeftNode().setNodeColour(Colour.BLACK);
-                    rightRotation(x.getParentNode());
-                    x = root;
-                }
-            }
-        }
-        x.setNodeColour(Colour.BLACK);
     }*/
 
+    /*private void switchNodes(RBTNode x, RBTNode y){
+        System.out.println("Switching node "+x.getBuildingNum()+" "+y.getBuildingNum());
+        RBTNode xParent;
+        RBTNode xLeft = x.getLeftNode();
+        RBTNode xRight = x.getRightNode();
+        Boolean xPos = false;
+        Colour xColour = getColour(x);
+        if(x==root){
+            xParent = null;
+        }else {
+            xParent = x.getParentNode();
+            if(x==x.getParentNode().getRightNode()){
+                xPos = true;
+            }
+        }
+        RBTNode yParent = y.getParentNode();
+        RBTNode yLeft = y.getLeftNode();
+        RBTNode yRight = y.getRightNode();
+        Boolean yPos = false;
+        Colour yColour = getColour(y);
+        if(y==y.getParentNode().getRightNode()){
+            yPos = true;
+        }
+        if(x==root){
+            root = y;
+            y.setLeftNode(xLeft);
+            if(yParent==x){
+                y.setRightNode(x);
+            }else {
+                y.setRightNode(xRight);
+            }
 
+            y.setParentNode(null);
+        }else {
+            if(xPos==false){
+                xParent.setLeftNode(y);
+            }else {
+                xParent.setRightNode(y);
+            }
+            if(yParent==x){
+                y.setRightNode(x);
+            }else {
+                y.setRightNode(xRight);
+            }
+            y.setParentNode(xParent);
+            y.setLeftNode(xLeft);
+            y.setNodeColour(xColour);
+        }
+        if(yPos==false){
+            yParent.setLeftNode(x);
+        }else {
+            yParent.setRightNode(x);
+        }
+        if(yParent==x){
+            x.setParentNode(y);
+        }else {
+            x.setParentNode(yParent);
+        }
+        x.setLeftNode(yLeft);
+        x.setRightNode(yRight);
+        x.setNodeColour(yColour);
+        //printNode(root, 13);
+    }*/
 
-    private void switchData(RBTNode node, RBTNode tempNode) {
+    private void swapData(RBTNode node, RBTNode tempNode) {
+        int nodeBuildingNum = node.getBuildingNum();
+        //HeapNode nodeHeapNode = node.getHeapNode();
         node.setBuildingNum(tempNode.getBuildingNum());
-        node.setHeapNode(tempNode.getHeapNode());
+        tempNode.setBuildingNum(nodeBuildingNum);
+        //node.setHeapNode(tempNode.getHeapNode());
+        //tempNode.setHeapNode(nodeHeapNode);
+        //tempNode.getHeapNode().setRbtNode(tempNode);
+        //nodeHeapNode.setRbtNode(node);
     }
 
     private RBTNode getPredecessor(RBTNode node) {
@@ -517,7 +663,22 @@ public class RBTHelper {
             node.setNodeColour(Colour.BLACK);
         }
     }
-
+    public void printNode(RBTNode node, int buildingNum){
+        //System.out.println(node.getBuildingNum());
+        if(node==null){
+            return;
+        }
+        if(buildingNum == node.getBuildingNum()){
+            //System.out.println("Node: "+node.getBuildingNum());
+            //System.out.println("Parent: "+node.getParentNode().getBuildingNum());
+            //System.out.println(node.getLeftNode()==null? null:"Left Node: "+node.getLeftNode().getBuildingNum());
+            //System.out.println(node.getRightNode()==null? null:"Right Node: "+node.getRightNode().getBuildingNum());
+        }else if(buildingNum < node.getBuildingNum()){
+            printNode(node.getLeftNode(), buildingNum);
+        }else if(buildingNum > node.getBuildingNum()){
+            printNode(node.getRightNode(), buildingNum);
+        }
+    }
     public RBTNode getRoot(){
         return this.root;
     }

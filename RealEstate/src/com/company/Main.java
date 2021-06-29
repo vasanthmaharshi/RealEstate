@@ -1,10 +1,11 @@
 package com.company;
+
 import com.company.project.*;
 import com.company.project.RBTHelper;
 public class Main {
     public static void main(String[] args) throws java.lang.Exception {
         Project group_1 = new Project(2000);
-        group_1.RBTInsert(12);
+        /*group_1.RBTInsert(12);
         group_1.printRBT();
         group_1.RBTInsert(5);
         group_1.printRBT();
@@ -30,8 +31,23 @@ public class Main {
         group_1.printRBT();
         group_1.RBTInsert(8);
         group_1.printRBT();
-        group_1.deleteNode(12);
+        group_1.deleteNode(15);
+        group_1.printRBT();*/
+
+
+        group_1.RBTInsert(20);
         group_1.printRBT();
+        group_1.RBTInsert(10);
+        group_1.printRBT();
+        group_1.RBTInsert(30);
+        group_1.printRBT();
+        group_1.RBTInsert(25);
+        group_1.printRBT();
+        group_1.RBTInsert(35);
+        group_1.printRBT();
+        group_1.deleteNode(10);
+        group_1.printRBT();
+
     }
 }
 

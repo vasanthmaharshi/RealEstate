@@ -12,6 +12,9 @@ public class RBTNode {
         this.buildingNum = buildingNum;
         this.nodeColour = Colour.RED;
         this.heapNode = heapNode;
+        this.leftNode = null;
+        this.rightNode = null;
+        this.parentNode = null;
     }
 
     public RBTNode(RBTNode x){
