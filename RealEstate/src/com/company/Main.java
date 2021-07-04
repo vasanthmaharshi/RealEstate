@@ -25,17 +25,12 @@ public class Main {
                 System.out.println(command);
 
             }*/
-            while(sc.hasNextLine() || group_1.getSize()!=0){
-                //System.out.println("GT: "+globalTime+" "+"CT "+commandTime);
+            while(sc.hasNextLine() || group_1.getSize()>(-1)){
                 while(commandTime==globalTime){
-                    //System.out.println(globalTime+" "+command);
                     if(command.equals("Insert")){
                         int buildingNum = Integer.parseInt(input.substring(input.indexOf('(')+1, input.indexOf(',')));
                         int totalTime = Integer.parseInt(input.substring(input.indexOf(',')+1, input.length()-1));
-                        //System.out.println("Inserting "+buildingNum);
                         group_1.insert(buildingNum, 0, totalTime);
-                        //System.out.println(group_1.getSize());
-                        //group_1.printHeap();
                     }else if(command.equals("PrintBuilding")){
                         String[] buildings = input.substring(input.indexOf('(')+1, input.length()-1).split(",");
                         if(buildings.length==1){
@@ -51,34 +46,32 @@ public class Main {
                         input = sc.nextLine();
                         commandTime = Integer.parseInt(input.substring(0, input.indexOf(":")));
                         command = input.substring(input.indexOf(" ")+1,input.indexOf("("));
-                        //System.out.println(command);
-                    }else {
-                        commandTime = 0;
+                    } else {
+                        commandTime = -1;
                     }
                 }
-                if(workDone==0 && presentConstruction==null && group_1.getSize()!=0){
-                    //group_1.printHeap();
-                    presentConstruction = group_1.heapExtract();
-                    //System.out.println("presentConstruction "+presentConstruction.getBuildingNum());
-                }else {
-                    workDone++;
-                    presentConstruction.setExecutedTime(presentConstruction.getExecutedTime()+1);
-                    //System.out.println("presentConstruction "+presentConstruction.getBuildingNum());
-                    if(presentConstruction.getExecutedTime() == presentConstruction.getTotalTime()-1) {
-                        System.out.println(presentConstruction.getBuildingNum()+" "+globalTime);
-                        workDone = 0;
-                        group_1.deleteNode(presentConstruction.getBuildingNum());
-                        presentConstruction = null;
-                    }else if(workDone==4){
-                        //System.out.println("5 days work");
-                        group_1.heapInsert(presentConstruction);
-                        presentConstruction = null;
-                        workDone = 0;
-                    }
 
+                if(presentConstruction==null && group_1.getSize()<=0){
+                    break;
+                }else if(presentConstruction==null && group_1.getSize()!=0){
+                    presentConstruction = group_1.heapExtract();
                 }
+                presentConstruction.setExecutedTime(presentConstruction.getExecutedTime()+1);
+                workDone++;
                 globalTime++;
+                if(presentConstruction.getExecutedTime() == presentConstruction.getTotalTime()) {
+                    System.out.printf("(%d,%d)\n",presentConstruction.getBuildingNum(),globalTime);
+                    workDone = 0;
+                    group_1.deleteNode(presentConstruction.getBuildingNum());
+                    presentConstruction = null;
+                }else if(workDone==5){
+                    group_1.heapInsert(presentConstruction);
+                    presentConstruction = null;
+                    workDone = 0;
+                }
+
             }
+
         }catch (IOException e){
             e.printStackTrace();
         }

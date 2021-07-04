@@ -60,17 +60,16 @@ public class heapHelper {
     }
 
     public void heapifyDown(int curr){
-        //System.out.println("curr "+curr);
-        if(curr>size){
+        if(curr==size){
             return;
         }
         int minNode;
         int leftChild = 2*curr+1;
         int rightChild = 2*curr+2;
-        if(leftChild>size){
+        if(leftChild>=size){
             return;
         }
-        if(rightChild>size){
+        if(rightChild>=size){
             minNode = leftChild;
         }else if(Heap[leftChild].getExecutedTime()<Heap[rightChild].getExecutedTime()){
             minNode = leftChild;
@@ -83,7 +82,6 @@ public class heapHelper {
                 minNode = rightChild;
             }
         }
-        //System.out.println("curr "+curr+" size "+size);
         if(Heap[curr].getExecutedTime()>Heap[minNode].getExecutedTime()){
             swapNodes(curr, minNode);
         }else if(Heap[curr].getExecutedTime()==Heap[minNode].getExecutedTime()){

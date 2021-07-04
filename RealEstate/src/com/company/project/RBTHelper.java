@@ -4,6 +4,7 @@ import com.company.HeapNode;
 import com.company.RBTNode;
 
 import javax.sound.midi.SysexMessage;
+import java.awt.*;
 
 public class RBTHelper {
     private RBTNode root;
@@ -210,10 +211,10 @@ public class RBTHelper {
             u = v.getRightNode();
         }else if(v.getLeftNode()!=null && v.getRightNode()!=null){
             successor = getSuccessor(v.getRightNode());
-            printNode(root, v.getBuildingNum());
+            //printNode(root, v.getBuildingNum());
             swapData(v, successor);
             v = successor;
-            System.out.println(v.getBuildingNum());
+            //System.out.println(v.getBuildingNum());
             vOriginalColour = getColour(v);
             if(v.getRightNode()!=null){
                 u = v.getRightNode();
@@ -241,12 +242,12 @@ public class RBTHelper {
             }else {
                 rbTransplant(v, u);
                 RBTNode p, s, r;
-                printNode(root, u.getBuildingNum());
+                //printNode(root, u.getBuildingNum());
                 while(getColour(u)==Colour.BLACK && u!=root){
                     p = u.getParentNode();
                     if(u==u.getParentNode().getRightNode()){
                         s = u.getParentNode().getLeftNode();
-                        printNode(root, s.getBuildingNum());
+                        //printNode(root, s.getBuildingNum());
                         if(getColour(s)==Colour.BLACK){
                             if(getColour(s.getLeftNode())==Colour.RED){
                                 r = s.getLeftNode();
@@ -318,13 +319,13 @@ public class RBTHelper {
                 v.setNodeColour(Colour.BLACK);
             }else {
                 RBTNode p, s, r;
-                System.out.println("case 2");
-                printNode(root, v.getBuildingNum());
+                //System.out.println("case 2");
+                //printNode(root, v.getBuildingNum());
                 while(getColour(v)==Colour.BLACK && v!=root){
                     p = v.getParentNode();
                     if(v==v.getParentNode().getRightNode()){
                         s = v.getParentNode().getLeftNode();
-                        printNode(root, s.getBuildingNum());
+                        //printNode(root, s.getBuildingNum());
                         if(getColour(s)==Colour.BLACK){
                             if(getColour(s.getLeftNode())==Colour.RED){
                                 r = s.getLeftNode();
@@ -334,7 +335,7 @@ public class RBTHelper {
                                 v = root;
                             }else if(getColour(s.getRightNode())==Colour.RED){
                                 r = s.getRightNode();
-                                printNode(root, r.getBuildingNum());
+                                //printNode(root, r.getBuildingNum());
                                 leftRotation(s);
                                 rightRotation(p);
                                 r.setNodeColour(Colour.BLACK);
@@ -642,6 +643,7 @@ public class RBTHelper {
 
     public void printBuilding(int buildingNum){
         printNode(root, buildingNum);
+        System.out.println();
     }
 
     public void printNode(RBTNode node, int buildingNum){
@@ -649,6 +651,8 @@ public class RBTHelper {
             return;
         }
         if(buildingNum == node.getBuildingNum()){
+            HeapNode x = node.getHeapNode();
+            System.out.printf("(%d,%d,%d)\n", x.getBuildingNum(),x.getExecutedTime(),x.getTotalTime());
             //System.out.println("Node: "+node.getBuildingNum());
         }else if(buildingNum < node.getBuildingNum()){
             printNode(node.getLeftNode(), buildingNum);
@@ -672,7 +676,8 @@ public class RBTHelper {
         }
         if(building1<=node.getBuildingNum() && building2>=node.getBuildingNum()){
             HeapNode x = node.getHeapNode();
-            System.out.print(node.getBuildingNum()+" ");
+            //System.out.print(node.getBuildingNum()+" ");
+            System.out.printf("(%d,%d,%d)", x.getBuildingNum(), x.getExecutedTime(), x.getTotalTime());
         }
         if(building2>node.getBuildingNum()){
             printNodes(node.getRightNode(), building1, building2);
