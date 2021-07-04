@@ -7,8 +7,8 @@ import javax.sound.midi.SysexMessage;
 
 public class RBTHelper {
     private RBTNode root;
-    public void RBTInsert(int buildingNum){
-        RBTNode node = new RBTNode(buildingNum);
+    public void RBTInsert(RBTNode node){
+        //RBTNode node = new RBTNode(buildingNum);
         root = insertIntoTree(root, node);
         fixViolations(node);
     }
@@ -82,7 +82,7 @@ public class RBTHelper {
     }
 
     private void rightRotation(RBTNode node){
-        System.out.println("Rotating to the right on node "+node.getBuildingNum());
+        //System.out.println("Rotating to the right on node "+node.getBuildingNum());
         //printNode(root, 17);
         RBTNode tempLeftNode = node.getLeftNode();
         node.setLeftNode(tempLeftNode.getRightNode());
@@ -103,7 +103,7 @@ public class RBTHelper {
     }
 
     public void leftRotation(RBTNode node){
-        System.out.println("Rotating to the left on node "+node.getBuildingNum());
+        //System.out.println("Rotating to the left on node "+node.getBuildingNum());
         RBTNode tempRightNode = node.getRightNode();
         node.setRightNode(tempRightNode.getLeftNode());
         if(tempRightNode.getLeftNode()!=null){
@@ -181,7 +181,7 @@ public class RBTHelper {
     }*/
 
     public void deleteNode(int buildingNum){
-        System.out.println("Deleting: "+buildingNum);
+        //System.out.println("Deleting: "+buildingNum);
         deleteNodeHelper(root, buildingNum);
     }
 
@@ -210,13 +210,10 @@ public class RBTHelper {
             u = v.getRightNode();
         }else if(v.getLeftNode()!=null && v.getRightNode()!=null){
             successor = getSuccessor(v.getRightNode());
-            //printNode(root, 14);
             printNode(root, v.getBuildingNum());
             swapData(v, successor);
             v = successor;
             System.out.println(v.getBuildingNum());
-            //printNode(root, v.getBuildingNum());
-            //printNode(root, successor.getBuildingNum());
             vOriginalColour = getColour(v);
             if(v.getRightNode()!=null){
                 u = v.getRightNode();
@@ -567,11 +564,11 @@ public class RBTHelper {
 
     private void swapData(RBTNode node, RBTNode tempNode) {
         int nodeBuildingNum = node.getBuildingNum();
-        //HeapNode nodeHeapNode = node.getHeapNode();
+        HeapNode nodeHeapNode = node.getHeapNode();
         node.setBuildingNum(tempNode.getBuildingNum());
         tempNode.setBuildingNum(nodeBuildingNum);
-        //node.setHeapNode(tempNode.getHeapNode());
-        //tempNode.setHeapNode(nodeHeapNode);
+        node.setHeapNode(tempNode.getHeapNode());
+        tempNode.setHeapNode(nodeHeapNode);
         //tempNode.getHeapNode().setRbtNode(tempNode);
         //nodeHeapNode.setRbtNode(node);
     }
@@ -610,28 +607,14 @@ public class RBTHelper {
             System.out.print("["+node.getBuildingNum() +" "+ getColour(node)+"] ");
             RBTInOrder(node.getRightNode());
         }
-        /*if(node.getLeftNode()!=null){
-            RBTPreOrder(node.getLeftNode());
-        }
-        System.out.print(node.getBuildingNum()+" ");
-        if(node.getRightNode()!=null){
-            RBTPreOrder(node.getRightNode());
-        }*/
     }
 
     public void RBTPreOrder(RBTNode node){
-        if(node!=null){
-            System.out.print("["+node.getBuildingNum() +" "+ getColour(node)+"] ");
+        if(node!=null) {
+            System.out.print("[" + node.getBuildingNum() + " " + getColour(node) + "] ");
             RBTPreOrder(node.getLeftNode());
             RBTPreOrder(node.getRightNode());
         }
-        /*System.out.print(node.getBuildingNum()+" ");
-        if(node.getLeftNode()!=null){
-            RBTPreOrder(node.getLeftNode());
-        }
-        if(node.getRightNode()!=null){
-            RBTPreOrder(node.getRightNode());
-        }*/
     }
 
     public void RBTPostOrder(RBTNode node){
@@ -640,13 +623,6 @@ public class RBTHelper {
             RBTPostOrder(node.getRightNode());
             System.out.print("["+node.getBuildingNum() +" "+ getColour(node)+"] ");
         }
-        /*if(node.getLeftNode()!=null){
-            RBTPreOrder(node.getLeftNode());
-        }
-        if(node.getRightNode()!=null){
-            RBTPreOrder(node.getRightNode());
-        }
-        System.out.print(node.getBuildingNum()+" ");*/
     }
 
     public Colour getColour(RBTNode node){
@@ -663,22 +639,47 @@ public class RBTHelper {
             node.setNodeColour(Colour.BLACK);
         }
     }
+
+    public void printBuilding(int buildingNum){
+        printNode(root, buildingNum);
+    }
+
     public void printNode(RBTNode node, int buildingNum){
-        //System.out.println(node.getBuildingNum());
         if(node==null){
             return;
         }
         if(buildingNum == node.getBuildingNum()){
             //System.out.println("Node: "+node.getBuildingNum());
-            //System.out.println("Parent: "+node.getParentNode().getBuildingNum());
-            //System.out.println(node.getLeftNode()==null? null:"Left Node: "+node.getLeftNode().getBuildingNum());
-            //System.out.println(node.getRightNode()==null? null:"Right Node: "+node.getRightNode().getBuildingNum());
         }else if(buildingNum < node.getBuildingNum()){
             printNode(node.getLeftNode(), buildingNum);
         }else if(buildingNum > node.getBuildingNum()){
             printNode(node.getRightNode(), buildingNum);
         }
     }
+
+    public void printBuildings(int building1, int building2){
+        printNodes(root, building1, building2);
+        System.out.println();
+    }
+
+    public void printNodes(RBTNode node, int building1, int building2){
+        if(node==null){
+            return;
+        }
+
+        if(building1<node.getBuildingNum()){
+            printNodes(node.getLeftNode(), building1, building2);
+        }
+        if(building1<=node.getBuildingNum() && building2>=node.getBuildingNum()){
+            HeapNode x = node.getHeapNode();
+            System.out.print(node.getBuildingNum()+" ");
+        }
+        if(building2>node.getBuildingNum()){
+            printNodes(node.getRightNode(), building1, building2);
+        }
+    }
+
+
     public RBTNode getRoot(){
         return this.root;
     }

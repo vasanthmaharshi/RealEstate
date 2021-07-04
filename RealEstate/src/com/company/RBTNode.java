@@ -8,7 +8,7 @@ public class RBTNode {
     private RBTNode parentNode;
     private HeapNode heapNode;
 
-    public RBTNode(int buildingNum){
+    public RBTNode(int buildingNum, HeapNode heapNode){
         this.buildingNum = buildingNum;
         this.nodeColour = Colour.RED;
         this.heapNode = heapNode;

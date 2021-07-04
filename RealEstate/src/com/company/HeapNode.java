@@ -4,13 +4,11 @@ public class HeapNode {
     private final int buildingNum;
     private int executedTime;
     private int totalTime;
-    private RBTNode rbtNode;
-    HeapNode(int buildingNum, int executedTime,int totalTime){
+    public HeapNode(int buildingNum, int executedTime,int totalTime){
         this.buildingNum = buildingNum;
         this.executedTime = executedTime;
         this.totalTime = totalTime;
     }
-
     public int getExecutedTime() {
         return executedTime;
     }
@@ -23,10 +21,6 @@ public class HeapNode {
         return totalTime;
     }
 
-    public RBTNode getRBTNode(){
-        return rbtNode;
-    }
-
     public void setTotalTime(int totalTime) {
         this.totalTime = totalTime;
     }
@@ -35,7 +29,4 @@ public class HeapNode {
         this.executedTime = executedTime;
     }
 
-    public void setRbtNode(RBTNode rbtNode) {
-        this.rbtNode = rbtNode;
-    }
 }
